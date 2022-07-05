@@ -236,3 +236,32 @@ customer_id in (148, 526)
 GROUP BY customer_id
 order by customer_id;
 ------------------------
+
+/*
+1. Realizar Select na tabela “inventory” fazendo join com a tabela “film” e
+mostre o inventory_id e o título do filme
+2. Realizar Select na tabela “Rental” mostrando a data do aluguel, o nome
+completo do customer, do staff e o título do filme
+3. Realizar Select na tabela “Filme” mostrando a lista de nome dos atores,
+separados por “;”
+ */
+
+select i.inventory_id, f.title, i.film_id, f.film_id
+from inventory i
+join film f on i.film_id = f.film_id;
+
+select to_char(r.rental_date, 'dd/mm/yyyy') rental_date,
+       concat(c.first_name, ' ', c.last_name) name_costumer,
+       concat(s.first_name, ' ', s.last_name) name_staff,
+       f.title
+from rental r
+join inventory i on r.inventory_id = i.inventory_id
+join film f on i.film_id = f.film_id
+join staff s on r.staff_id = s.staff_id
+join customer c on r.customer_id = c.customer_id;
+
+select f.title, string_agg(a.first_name, ';') actor_name
+from film f
+join film_actor fa on f.film_id = fa.film_id
+join actor a on fa.actor_id = a.actor_id
+group by f.title;
