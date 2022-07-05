@@ -185,3 +185,54 @@ FROM payment
 GROUP BY customer_id
 HAVING SUM(amount) > 200
 ORDER BY 1 desc;
+
+---------- #JOIN, STRING_AGG e UNION ALL
+select f.film_id, f.title, a.actor_id, --a.first_name || ' ' || a.last_name
+concat(a.first_name, ' ', a.last_name)
+from film f
+right join  film_actor fa on f.film_id = fa.film_id
+right join actor a on fa.actor_id = a.actor_id
+where
+--a.actor_id is null
+f.film_id is null
+;
+
+select title, replace(title, ' ', '/')
+from film;
+
+select f.film_id, a.actor_id, fa.film_id, fa.actor_id
+from film f
+left join  film_actor fa on f.film_id = fa.film_id
+left join actor a on fa.actor_id = a.actor_id
+where
+a.actor_id is null OR
+f.film_id is null
+;
+
+select f.film_id, a.actor_id, fa.film_id, fa.actor_id
+from film f
+         full outer join  film_actor fa on f.film_id = fa.film_id
+         full outer join actor a on fa.actor_id = a.actor_id
+where
+    a.actor_id is null OR
+    f.film_id is null
+;
+
+SELECT SUM(amount) as soma, string_agg(payment_id::text, ';'), customer_id
+FROM payment
+GROUP BY customer_id
+HAVING SUM(amount) > 200
+ORDER BY 1 desc;
+
+SELECT 'Total do Cliente: ' as info, SUM(amount) as valor, customer_id
+FROM payment WHERE
+customer_id in (148, 526)
+GROUP BY customer_id
+UNION ALL
+SELECT 'Quantidade do Cliente: ' as info, count(rental_id) as qtd, customer_id
+FROM rental
+WHERE
+customer_id in (148, 526)
+GROUP BY customer_id
+order by customer_id;
+------------------------
