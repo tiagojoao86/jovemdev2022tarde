@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:12.3
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      TZ: 'GMT-3'
+      PGTZ: 'GMT-3'
+    restart: always
+    container_name: postgres-v12
+    ports:
+      - 5432:5432
+    volumes:
+     - ./resources:/docker-entrypoint-initdb.d
+    expose:
+      - 22
