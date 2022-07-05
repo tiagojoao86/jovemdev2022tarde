@@ -125,3 +125,63 @@ select sum(amount), count(amount), customer_id
 from payment
 group by customer_id
 having count(amount) > 40;
+
+/*
+ 1. Realizar Select na tabela “payment” somando a coluna “amount” e
+agrupando pela coluna customer_id, ordene de forma a mostrar as
+maiores somas primeiro
+2. Realizar Select na tabela “rental” contando quanta locações foram feitas
+e agrupando pela coluna customer_id, ordene de forma a mostrar as
+menores contagens primeiro
+3. Realizar Select na tabela “rental” de forma a descobrir qual cliente fez a
+última locação;
+4. Realizar Select na tabela “rental” de forma a descobrir qual cliente fez a
+primeira locação;
+ */
+
+SELECT SUM(amount) as soma, customer_id
+FROM payment
+GROUP BY customer_id
+--ORDER BY 1 desc;
+--ORDER BY soma desc;
+ORDER BY SUM(amount) desc;
+
+SELECT count(rental_id) as quantidade, customer_id
+FROM rental
+GROUP BY customer_id
+ORDER BY 1 desc;
+--ORDER BY soma desc;
+--ORDER BY count(rental_id) desc;
+
+SELECT max(rental_date) maior_data, customer_id as id_cliente
+FROM rental
+GROUP BY customer_id
+ORDER BY 1 desc
+LIMIT 1;
+
+SELECT min(rental_date) maior_data, customer_id as id_cliente
+FROM rental
+GROUP BY customer_id
+ORDER BY 1 asc
+LIMIT 1;
+
+/*
+1. Realizar Select na tabela “payment” calculando a média da coluna
+“amount” e agrupando pela coluna customer_id, ordene mostrando as
+maiores médias primeiro
+
+2. Realizar Select na tabela “payment” somando a coluna “amount” e
+agrupando pela coluna customer_id, mostre somente os clientes que
+possuem somatório maior de 200
+ */
+
+SELECT ROUND(AVG(amount),2) as soma, customer_id
+FROM payment
+GROUP BY customer_id
+ORDER BY 1 desc;
+
+SELECT SUM(amount) as soma, customer_id
+FROM payment
+GROUP BY customer_id
+HAVING SUM(amount) > 200
+ORDER BY 1 desc;
