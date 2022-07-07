@@ -88,3 +88,52 @@ $$ LANGUAGE plpgsql;
 
 SELECT seta_nome_completo_todos_atores();
 SELECT * FROM actor;
+
+-- customer - valor total de alguel
+-- toda que vez que houver um insert na tabela payment
+-- somar na tabela customer o total;
+
+alter table customer add column total_amount numeric;
+select * from customer;
+
+CREATE OR REPLACE FUNCTION soma_total_valor_cliente() RETURNS TRIGGER AS $$
+    BEGIN
+        IF (TG_OP = 'INSERT') THEN
+            UPDATE customer SET total_amount = COALESCE(total_amount, 0) + NEW.amount
+            WHERE customer_id = NEW.customer_id;
+        END IF;
+        IF (TG_OP = 'UPDATE') THEN
+            UPDATE customer SET total_amount =
+                COALESCE(total_amount, 0) + NEW.amount - OLD.amount
+            WHERE customer_id = NEW.customer_id;
+        END IF;
+        IF (TG_OP = 'DELETE') THEN
+            UPDATE customer SET total_amount =
+                COALESCE(total_amount, 0) - OLD.amount
+            WHERE customer_id = OLD.customer_id;
+            RETURN OLD;
+        END IF;
+
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER soma_total_valor_cliente_tg AFTER INSERT OR UPDATE OR DELETE
+    ON payment FOR EACH ROW
+        EXECUTE PROCEDURE soma_total_valor_cliente();
+
+DROP TRIGGER soma_total_valor_cliente_tg on payment;
+
+SELECT * FROM customer; --3
+SELECT * FROM staff; -- 2
+SELECT * FROM inventory; --2
+
+INSERT INTO rental (rental_date, inventory_id, customer_id, return_date, staff_id)
+VALUES (NOW(), 2, 3, NOW() + interval '3' day , 2);
+
+INSERT INTO payment (customer_id, staff_id, rental_id, amount, payment_date)
+    VALUES (3, 2, 16051, 15.00, now()) RETURNING payment_id;
+
+SELECT * FROM customer WHERE customer_id = 3;
+UPDATE payment SET amount = 5.00 WHERE payment_id = 32105;
+DELETE FROM payment WHERE payment_id = 32109;
