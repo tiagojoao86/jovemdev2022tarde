@@ -51,3 +51,15 @@ CREATE TABLE aluno (
    nome VARCHAR(200),
    cpf VARCHAR(11) UNIQUE NOT NULL
 );
+
+----- VIEWS
+create view staff_vw as
+SELECT s.staff_id,
+       concat(s.first_name, ' ', s.last_name) AS nome,
+       a.address,
+       a.postal_code,
+       a.phone,
+       c.city
+FROM staff s
+         JOIN address a ON s.address_id = a.address_id
+         JOIN city c ON a.city_id = c.city_id;
