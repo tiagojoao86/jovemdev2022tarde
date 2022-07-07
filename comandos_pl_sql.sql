@@ -137,3 +137,35 @@ INSERT INTO payment (customer_id, staff_id, rental_id, amount, payment_date)
 SELECT * FROM customer WHERE customer_id = 3;
 UPDATE payment SET amount = 5.00 WHERE payment_id = 32105;
 DELETE FROM payment WHERE payment_id = 32109;
+
+/*
+3 - Crie uma trigger para que sempre que for inserido um ator
+novo, preencha a coluna criada na tarefa anterior com o nome
+completo do ator (nome sobrenome);
+*/
+
+CREATE OR REPLACE FUNCTION atualiza_fullname_actor_fc() RETURNS TRIGGER AS $$
+    BEGIN
+        IF (TG_OP = 'INSERT') THEN
+            NEW.full_name = concat(NEW.first_name, ' ', NEW.last_name);
+        END IF;
+        IF (TG_OP = 'UPDATE') THEN
+            NEW.full_name = concat(NEW.first_name, ' ', NEW.last_name);
+        END IF;
+
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER atualiza_fullname_actor_tg BEFORE INSERT OR UPDATE
+    ON actor FOR EACH ROW
+EXECUTE PROCEDURE atualiza_fullname_actor_fc();
+
+drop trigger atualiza_fullname_actor_tg on actor;
+
+INSERT INTO actor (first_name, last_name)
+    VALUES ('Tiago', 'Pereira') returning actor_id;
+
+--delete from actor where actor_id = 211;
+select * from actor where actor_id = 212;
+update actor set first_name = 'José' where actor_id = 212;
