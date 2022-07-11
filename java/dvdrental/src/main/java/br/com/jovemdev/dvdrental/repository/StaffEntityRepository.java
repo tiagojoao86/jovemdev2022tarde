@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface StaffEntityRepository extends JpaRepository<StaffEntity, Long> {
+public interface StaffEntityRepository extends JpaRepository<StaffEntity, Long>, StaffEntityRepositoryCustom {
     List<StaffEntity> findByFirstName(String name);
 
     @Query(value = "SELECT * FROM staff WHERE first_name ilike '%' || ?1 || '%'", nativeQuery = true)
